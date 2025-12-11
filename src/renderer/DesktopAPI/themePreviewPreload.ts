@@ -14,7 +14,7 @@ import { themes } from "./ThemesApplier";
   });
 
   ipcRenderer.on("changeZoomFactor", (_, zoom) => {
-    document.body.style.zoom = zoom;
+   (document.body.style as any).zoom = zoom;
   });
 
   function keydownHandler(event: KeyboardEvent) {

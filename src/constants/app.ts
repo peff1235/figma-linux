@@ -170,7 +170,7 @@ export const PROPS_WITH_COLOR = [
 ];
 
 export const AVAILABLE_THEME_COLOR_VALUE = /^#[a-fA-F0-9]{6,6}$/;
-export const AVAILABLE_THEME_FIELDS_COUNT = 43;
+export const AVAILABLE_THEME_FIELDS_COUNT = 58;
 export const AVAILABLE_THEME_FIELDS = [
   "text",
   "textActive",
@@ -215,6 +215,23 @@ export const AVAILABLE_THEME_FIELDS = [
   "fgComponentDisabledRowActive",
   "bgWindowClose",
   "bgBetaLabel",
+  // UI3 specific fields
+  "bgBottomNav",
+  "bgBottomNavHover",
+  "bgBottomNavActive",
+  "fgBottomNav",
+  "fgBottomNavHover",
+  "fgBottomNavActive",
+  "bgSidebar",
+  "bgSidebarHover",
+  "fgSidebar",
+  "fgSidebarHover",
+  "bgIconPrimary",
+  "bgIconSecondary",
+  "fgIconPrimary",
+  "fgIconSecondary",
+  "bgAiTool",
+  "fgAiTool",
 ];
 
 export const DEFAULT_PALETTE: Themes.Palette = {
@@ -261,6 +278,23 @@ export const DEFAULT_PALETTE: Themes.Palette = {
   "fg-component-disabled-row-active": "#bfbafc",
   "bg-window-close": "#e81123",
   "bg-beta-label": "#1bc47d",
+  // UI3 specific fields
+  "bg-bottom-nav": "#f5f5f5",
+  "bg-bottom-nav-hover": "#e0e0e0",
+  "bg-bottom-nav-active": "#18a0fb",
+  "fg-bottom-nav": "#666666",
+  "fg-bottom-nav-hover": "#333333",
+  "fg-bottom-nav-active": "#ffffff",
+  "bg-sidebar": "#ffffff",
+  "bg-sidebar-hover": "#f0f0f0",
+  "fg-sidebar": "#333333",
+  "fg-sidebar-hover": "#18a0fb",
+  "bg-icon-primary": "#18a0fb",
+  "bg-icon-secondary": "#666666",
+  "fg-icon-primary": "#ffffff",
+  "fg-icon-secondary": "#ffffff",
+  "bg-ai-tool": "#7b61ff",
+  "fg-ai-tool": "#ffffff",
 };
 
 export const PALETTE_TEXT: Types.Dic<string> = {
@@ -307,6 +341,23 @@ export const PALETTE_TEXT: Types.Dic<string> = {
   "fg-component-disabled-row-active": "Component disabled row active color",
   "bg-window-close": "Window close bg color",
   "bg-beta-label": "Beta button bg color",
+  // UI3 specific fields
+  "bg-bottom-nav": "Bottom navigation bg color",
+  "bg-bottom-nav-hover": "Bottom navigation hover bg color",
+  "bg-bottom-nav-active": "Bottom navigation active bg color",
+  "fg-bottom-nav": "Bottom navigation text color",
+  "fg-bottom-nav-hover": "Bottom navigation hover text color",
+  "fg-bottom-nav-active": "Bottom navigation active text color",
+  "bg-sidebar": "Sidebar bg color",
+  "bg-sidebar-hover": "Sidebar hover bg color",
+  "fg-sidebar": "Sidebar text color",
+  "fg-sidebar-hover": "Sidebar hover text color",
+  "bg-icon-primary": "Primary icon bg color",
+  "bg-icon-secondary": "Secondary icon bg color",
+  "fg-icon-primary": "Primary icon text color",
+  "fg-icon-secondary": "Secondary icon text color",
+  "bg-ai-tool": "AI tool bg color",
+  "fg-ai-tool": "AI tool text color",
 };
 
 export const DEFAULT_THEME = {

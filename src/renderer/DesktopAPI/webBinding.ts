@@ -11,8 +11,8 @@ interface IntiApiOptions {
   fileBrowser: boolean;
 }
 
-const API_VERSION = 111;
-const APP_VERSION = '999.0.0';
+const API_VERSION = 135;
+const APP_VERSION = '1.0.0';
 let webPort: MessagePort;
 const mainProcessCancelCallbacks: Map<number, () => void> = new Map();
 
@@ -171,6 +171,31 @@ const initWebBindings = (): void => {
 
   E.ipcRenderer.on("handlePluginMenuAction", (event: IpcRendererEvent, pluginMenuAction: any) => {
     webPort.postMessage({ name: "handlePluginMenuAction", args: { pluginMenuAction } });
+  });
+
+  // UI3 specific handlers
+  E.ipcRenderer.on("openProductSurface", (event: IpcRendererEvent, surfaceType: string, args: any) => {
+    webPort.postMessage({ name: "openProductSurface", args: { surfaceType, ...args } });
+  });
+
+  E.ipcRenderer.on("setBottomNavState", (event: IpcRendererEvent, state: any) => {
+    webPort.postMessage({ name: "setBottomNavState", args: { state } });
+  });
+
+  E.ipcRenderer.on("requestAiCredits", (event: IpcRendererEvent, request: any) => {
+    webPort.postMessage({ name: "requestAiCredits", args: { request } });
+  });
+
+  E.ipcRenderer.on("exportVariables", (event: IpcRendererEvent, variables: any) => {
+    webPort.postMessage({ name: "exportVariables", args: { variables } });
+  });
+
+  E.ipcRenderer.on("devModeReady", (event: IpcRendererEvent, ready: boolean) => {
+    webPort.postMessage({ name: "devModeReady", args: { ready } });
+  });
+
+  E.ipcRenderer.on("webhooksV2Update", (event: IpcRendererEvent, update: any) => {
+    webPort.postMessage({ name: "webhooksV2Update", args: { update } });
   });
 };
 
@@ -403,9 +428,34 @@ const publicAPI: any = {
   },
 
   async getFontFile(args: WebApi.GetFontFile) {
-    const fontBuffer = await E.ipcRenderer.invoke("getFontFile", args);
+   const fontBuffer = await E.ipcRenderer.invoke("getFontFile", args);
 
-    return { data: fontBuffer, transferList: [fontBuffer] };
+   return { data: fontBuffer, transferList: [fontBuffer] };
+  },
+
+  // UI3 specific methods
+  openProductSurface(args: any) {
+   sendMsgToMain("openProductSurface", args.surfaceType, args);
+  },
+
+  setBottomNavState(args: any) {
+   sendMsgToMain("setBottomNavState", args.state);
+  },
+
+  requestAiCredits(args: any) {
+   sendMsgToMain("requestAiCredits", args.request);
+  },
+
+  exportVariables(args: any) {
+   sendMsgToMain("exportVariables", args.variables);
+  },
+
+  devModeReady(args: any) {
+   sendMsgToMain("devModeReady", args.ready);
+  },
+
+  webhooksV2Update(args: any) {
+   sendMsgToMain("webhooksV2Update", args.update);
   },
 
   getClipboardData(args: any) {

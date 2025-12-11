@@ -156,6 +156,55 @@ export class ThemesApplier {
       if (key === "bg-beta-label") {
         el.style.setProperty("--color-bg-info", value);
       }
+      // UI3 specific mappings
+      if (key === "bg-bottom-nav") {
+        el.style.setProperty("--color-bg-bottom-nav", value);
+      }
+      if (key === "bg-bottom-nav-hover") {
+        el.style.setProperty("--color-bg-bottom-nav-hover", value);
+      }
+      if (key === "bg-bottom-nav-active") {
+        el.style.setProperty("--color-bg-bottom-nav-active", value);
+      }
+      if (key === "fg-bottom-nav") {
+        el.style.setProperty("--color-text-bottom-nav", value);
+      }
+      if (key === "fg-bottom-nav-hover") {
+        el.style.setProperty("--color-text-bottom-nav-hover", value);
+      }
+      if (key === "fg-bottom-nav-active") {
+        el.style.setProperty("--color-text-bottom-nav-active", value);
+      }
+      if (key === "bg-sidebar") {
+        el.style.setProperty("--color-bg-sidebar", value);
+      }
+      if (key === "bg-sidebar-hover") {
+        el.style.setProperty("--color-bg-sidebar-hover", value);
+      }
+      if (key === "fg-sidebar") {
+        el.style.setProperty("--color-text-sidebar", value);
+      }
+      if (key === "fg-sidebar-hover") {
+        el.style.setProperty("--color-text-sidebar-hover", value);
+      }
+      if (key === "bg-icon-primary") {
+        el.style.setProperty("--color-bg-icon-primary", value);
+      }
+      if (key === "bg-icon-secondary") {
+        el.style.setProperty("--color-bg-icon-secondary", value);
+      }
+      if (key === "fg-icon-primary") {
+        el.style.setProperty("--color-text-icon-primary", value);
+      }
+      if (key === "fg-icon-secondary") {
+        el.style.setProperty("--color-text-icon-secondary", value);
+      }
+      if (key === "bg-ai-tool") {
+        el.style.setProperty("--color-bg-ai-tool", value);
+      }
+      if (key === "fg-ai-tool") {
+        el.style.setProperty("--color-text-ai-tool", value);
+      }
     }
 
     el.style.setProperty("background-color", "var(--bg-panel)");
@@ -337,11 +386,36 @@ export class ThemesApplier {
           additionStyleRules.push(
             `${cssRule.selectorText}::-webkit-scrollbar-thumb { background: var(--color-scrollbar, rgba(179, 179, 179, 0.5)); border-radius: 10px; }`,
           );
-        }
-        additionStyleRules.push(
+          }
+          // UI3 specific selectors
+          if (/bottom_nav|bottomNavigation/.test(cssRule.selectorText)) {
+          additionStyleRules.push(
+            `${cssRule.selectorText} { background-color: var(--bg-bottom-nav); }`,
+          );
+          additionStyleRules.push(
+            `${cssRule.selectorText}:hover { background-color: var(--bg-bottom-nav-hover); }`,
+          );
+          additionStyleRules.push(
+            `${cssRule.selectorText}[data-active="true"] { background-color: var(--bg-bottom-nav-active); }`,
+          );
+          }
+          if (/sidebar|sideRail/.test(cssRule.selectorText)) {
+          additionStyleRules.push(
+            `${cssRule.selectorText} { background-color: var(--bg-sidebar); }`,
+          );
+          additionStyleRules.push(
+            `${cssRule.selectorText}:hover { background-color: var(--bg-sidebar-hover); }`,
+          );
+          }
+          if (/ai_tool|aiTool/.test(cssRule.selectorText)) {
+          additionStyleRules.push(
+            `${cssRule.selectorText} { background-color: var(--bg-ai-tool); color: var(--fg-ai-tool); }`,
+          );
+          }
+          additionStyleRules.push(
           `button[class*=css_builder--colorBgPressed] { color: var(--fg-toolbar-active); }`,
-        );
-        additionStyleRules.push(`input { color: var(--text-active); }`);
+          );
+          additionStyleRules.push(`input { color: var(--text-active); }`);
       }
     }
 
