@@ -74,6 +74,7 @@ declare namespace Electron {
     on(event: "enableColorSpaceSrgbWasChanged", listener: (enable: boolean) => void): this;
     on(event: "chromiumFlagsChanged", listener: (enable: boolean) => void): this;
     on(event: "disableThemesChanged", listener: (enable: boolean) => void): this;
+    on(event: "trackPatIssuance", listener: () => void): this;
 
     emit(event: string, ...args: any[]): boolean;
     emit(event: "newFile", sender: Electron.WebContents): boolean;
@@ -132,6 +133,7 @@ declare namespace Electron {
     emit(event: "enableColorSpaceSrgbWasChanged", enable: boolean): void;
     emit(event: "chromiumFlagsChanged", enable: boolean): void;
     emit(event: "disableThemesChanged", enable: boolean): void;
+    emit(event: "trackPatIssuance"): void;
   }
 
   interface IpcMain extends NodeJS.EventEmitter {

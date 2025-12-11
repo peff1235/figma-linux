@@ -36,10 +36,15 @@ export const FILE_EXTENSION_WHITE_LIST = [
   ".html",
   ".js",
   ".json",
+  ".json5",
+  ".yaml",
+  ".yml",
   ".jsx",
   ".md",
   ".ts",
   ".tsx",
+  ".wasm",
+  ".ai",
 ];
 
 export const NEW_FILE_TAB_TITLE = "New file";

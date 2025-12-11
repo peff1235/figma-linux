@@ -4,6 +4,7 @@ export const DEFAULT_SETTINGS: Types.SettingsInterface = {
   clientId: "",
   userId: "",
   authedUserIDs: [],
+  patIssuedAt: null,
   app: {
     logLevel: LogLevel.INFO,
     lastTimeClearLogFile: 0,

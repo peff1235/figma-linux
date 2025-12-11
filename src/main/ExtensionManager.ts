@@ -7,6 +7,7 @@ import * as Chokidar from "chokidar";
 import { dialogs } from "./Dialogs";
 import { storage } from "Storage";
 import { logger } from "./Logger";
+import { RegressionTester } from "./RegressionTester";
 import { FILE_EXTENSION_WHITE_LIST, FILE_WHITE_LIST, MANIFEST_FILE_NAME } from "Const";
 import { ALLOW_CODE_FILES, ALLOW_EXT_FILES, ALLOW_UI_FILES } from "Utils/Common";
 import { access, mkPath } from "Utils/Main";
@@ -210,6 +211,20 @@ export default class ExtensionManager {
         id,
         manifest,
       );
+
+      // Regression logging for extension loading
+      try {
+        const manifestObj = JSON.parse(manifest);
+        RegressionTester.logExtensionLoad(
+          id,
+          lastKnownName,
+          !!manifestObj.codeConnect,
+          manifestObj.webhooks?.version === 2,
+          !!manifestObj.aiAssets,
+        );
+      } catch (e) {
+        // Ignore parse errors for logging
+      }
 
       return {
         path: extensionPath,
@@ -455,6 +470,69 @@ export default class ExtensionManager {
     }
     if (manifest.build) {
       throw new Error(`Manifest 'build' value "${manifest.build}" not allowed`);
+    }
+
+    // Validate 2025 manifest schema extensions
+    this.validate2025ManifestSchema(manifest);
+  }
+
+  private validate2025ManifestSchema(manifest: any) {
+    // Support for Code Connect hooks
+    if (manifest.codeConnect) {
+      if (typeof manifest.codeConnect !== "object") {
+        throw new Error("Manifest 'codeConnect' must be an object");
+      }
+      if (manifest.codeConnect.hooks && !Array.isArray(manifest.codeConnect.hooks)) {
+        throw new Error("Manifest 'codeConnect.hooks' must be an array");
+      }
+    }
+
+    // Support for Webhooks v2 with secrets
+    if (manifest.webhooks) {
+      if (typeof manifest.webhooks !== "object") {
+        throw new Error("Manifest 'webhooks' must be an object");
+      }
+      if (manifest.webhooks.version === 2) {
+        if (manifest.webhooks.secrets && typeof manifest.webhooks.secrets !== "object") {
+          throw new Error("Manifest 'webhooks.secrets' must be an object");
+        }
+      }
+    }
+
+    // Support for AI asset bundles
+    if (manifest.aiAssets) {
+      if (!Array.isArray(manifest.aiAssets)) {
+        throw new Error("Manifest 'aiAssets' must be an array");
+      }
+      for (const asset of manifest.aiAssets) {
+        if (!asset.type || !asset.path) {
+          throw new Error("Each AI asset must have 'type' and 'path' properties");
+        }
+      }
+    }
+
+    // Extended capability flags for 2025
+    if (manifest.capabilities) {
+      if (!Array.isArray(manifest.capabilities)) {
+        throw new Error("Manifest 'capabilities' must be an array");
+      }
+      const validCapabilities = [
+        "codeConnect",
+        "webhooksV2",
+        "aiAssets",
+        "devMode",
+        "variables",
+        "collections",
+        "prototyping",
+        "presentation",
+        "fileAccess",
+        "networkAccess",
+      ];
+      for (const cap of manifest.capabilities) {
+        if (!validCapabilities.includes(cap)) {
+          logger.warn(`Unknown capability '${cap}' in manifest - may be new in 2025+`);
+        }
+      }
     }
   }
   private validateExtensionFiles(files: WebApi.WriteNewExtensionDirectoryToDiskFile[]): string[] {

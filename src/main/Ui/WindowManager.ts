@@ -14,8 +14,22 @@ import Window from "./Window";
 import MenuManager from "./MenuManager";
 import { storage } from "Main/Storage";
 import { dialogs } from "Main/Dialogs";
+import { logger } from "Main/Logger";
 import { CHROME_GPU, DEFAULT_WIN_OPTIONS, HOMEPAGE, NEW_FILE_TAB_TITLE, RECENT_FILES } from "Const";
-import { normalizeUrl, isAppAuthGrandLink, isAppAuthRedeem, parseURL } from "Utils/Common";
+import { 
+  normalizeUrl, 
+  isAppAuthGrandLink, 
+  isAppAuthRedeem, 
+  parseURL,
+  isDrawUrl,
+  isSitesUrl,
+  isMakeUrl,
+  isBuzzUrl,
+  isSlidesUrl,
+  isDevModeDeepLink,
+  isVariablesCollectionUrl,
+  isInAppUrl,
+} from "Utils/Common";
 import { mkPath } from "Utils/Main";
 
 export default class WindowManager {
@@ -43,8 +57,32 @@ export default class WindowManager {
   }
 
   public openUrl(url: string): void {
+    // Regression logging for new surface types
+    this.logUrlNavigation(url);
+    
     const window = this.windows.get(this.lastFocusedwindowId);
     window.openUrl(url);
+  }
+
+  // Regression hook: Log navigation to new surfaces for testing
+  private logUrlNavigation(url: string): void {
+    if (isDrawUrl(url)) {
+      logger.info("[regression] Opening Draw/Whiteboard URL:", url);
+    } else if (isSitesUrl(url)) {
+      logger.info("[regression] Opening Sites URL:", url);
+    } else if (isMakeUrl(url)) {
+      logger.info("[regression] Opening Make AI workspace URL:", url);
+    } else if (isBuzzUrl(url)) {
+      logger.info("[regression] Opening Buzz templates URL:", url);
+    } else if (isSlidesUrl(url)) {
+      logger.info("[regression] Opening Slides URL:", url);
+    } else if (isDevModeDeepLink(url)) {
+      logger.info("[regression] Opening Dev Mode deep link:", url);
+    } else if (isVariablesCollectionUrl(url)) {
+      logger.info("[regression] Opening Variables/Collections URL:", url);
+    } else if (isInAppUrl(url)) {
+      logger.info("[regression] Opening in-app URL:", url);
+    }
   }
 
   public newWindowFromMenu(windowId: number) {
@@ -277,6 +315,10 @@ export default class WindowManager {
     this.handleUrl(url);
     this.reloadAllWindows();
     this.tryHandleAppAuthRedeemUrl(data.redirectURL);
+
+    // Track PAT issuance for 90-day expiry monitoring
+    logger.info("[auth] App auth completed, tracking PAT issuance");
+    app.emit("trackPatIssuance");
 
     setTimeout(() => {
       window.loadUrlMainTab(url);

@@ -125,6 +125,7 @@ declare namespace Types {
     clientId: string;
     userId: string;
     authedUserIDs: string[];
+    patIssuedAt: number | null;
     app: {
       logLevel: number;
       lastTimeClearLogFile: number;
@@ -165,6 +166,8 @@ declare namespace Types {
       showVoiceIndicators: boolean;
       sidebarCollapsed: boolean;
       panelHeight: number;
+      ui3_migration_version?: string;
+      ui3_migration_date?: string;
     };
     theme: {
       currentTheme: string;

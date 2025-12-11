@@ -25,6 +25,7 @@ import {
   isFigmaDocLink,
   isFigmaBoardLink,
   isFigmaDesignLink,
+  isInAppUrl,
 } from "Utils/Common";
 import { storage } from "Main/Storage";
 import { logger } from "Main/Logger";
@@ -114,7 +115,7 @@ export default class MainTab {
   }
 
   private onMainTabWillNavigate(event: Event<any>, url: string) {
-    if (isValidProjectLink(url) || isPrototypeUrl(url)) {
+    if (isInAppUrl(url)) {
       app.emit("openUrlInNewTab", url);
 
       event.preventDefault();
@@ -161,7 +162,7 @@ export default class MainTab {
       event.preventDefault();
       return;
     }
-    if (isFigmaBoardLink(url) || isFigmaDesignLink(url)) {
+    if (isInAppUrl(url)) {
       app.emit("openUrlInNewTab", url);
       event.preventDefault();
       return;
@@ -173,12 +174,8 @@ export default class MainTab {
 
     if (/start_google_sso/.test(url)) return;
 
-    if (isPrototypeUrl(url) || isValidProjectLink(url)) {
-      app.emit("openUrlInNewTab", url);
-      return;
-    }
-    if (isFigmaBoardLink(url) || isFigmaDesignLink(url)) {
-      window.destroy()
+    if (isInAppUrl(url)) {
+      window.destroy();
       app.emit("openUrlInNewTab", url);
       return;
     }
@@ -189,7 +186,7 @@ export default class MainTab {
   private windowOpenHandler(details: HandlerDetails) {
    const { url } = details;
 
-   if (isPrototypeUrl(url) || isValidProjectLink(url) || isFigmaBoardLink(url) || isFigmaDesignLink(url)) {
+   if (isInAppUrl(url)) {
      app.emit("openUrlInNewTab", url);
      return { action: "deny" };
    } else {
