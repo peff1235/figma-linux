@@ -14,10 +14,12 @@ export default class SettingsView {
   constructor() {
     this.view = new BrowserView({
       webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false,
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
         experimentalFeatures: false,
-        webviewTag: true,
+        webviewTag: false,
+        spellcheck: true,
       },
     });
 
