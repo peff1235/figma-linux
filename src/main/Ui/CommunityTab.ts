@@ -112,30 +112,87 @@ export default class CommunityTab {
     return { action: "deny" };
     }
 
-    // UI3 specific methods
-    public openProductSurface(surfaceType: string, args: any) {
+  // UI3 specific methods
+  public openProductSurface(surfaceType: string, args: any) {
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
+    }
+    this.metadata.surfaceType = surfaceType as Types.ProductSurfaceType;
     this.view.webContents.send("openProductSurface", surfaceType, args);
-    }
+  }
 
-    public setBottomNavState(state: any) {
+  public setBottomNavState(state: Types.BottomNavState) {
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
+    }
+    this.metadata.bottomNavState = state;
     this.view.webContents.send("setBottomNavState", state);
-    }
+  }
 
-    public requestAiCredits(request: any) {
+  public updateSurfaceMetadata(metadata: Types.Ui3TabMetadata) {
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
+    }
+    this.metadata = { ...this.metadata, ...metadata };
+  }
+
+  public updateBottomNavFocus(focusIndex: number) {
+    if (this.metadata?.bottomNavState) {
+      this.metadata.bottomNavState.focusIndex = focusIndex;
+    }
+  }
+
+  public requestAiCredits(request: any) {
     this.view.webContents.send("requestAiCredits", request);
-    }
+  }
 
-    public exportVariables(variables: any) {
+  public exportVariables(variables: any) {
     this.view.webContents.send("exportVariables", variables);
+    if (this.metadata) {
+      this.metadata.hasVariables = true;
     }
+  }
 
-    public devModeReady(ready: boolean) {
+  public devModeReady(ready: boolean) {
     this.view.webContents.send("devModeReady", ready);
+    if (this.metadata) {
+      this.metadata.isDevMode = ready;
     }
+  }
 
-    public webhooksV2Update(update: any) {
+  public webhooksV2Update(update: any) {
     this.view.webContents.send("webhooksV2Update", update);
+  }
+
+  public updateVoiceState(active: boolean, participants: number = 0) {
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
     }
+    this.metadata.voiceIndicators = {
+      active,
+      participants
+    };
+  }
+
+  public updateComponentState(hasComponents: boolean) {
+    if (this.metadata) {
+      this.metadata.hasComponents = hasComponents;
+    }
+  }
+
+  private createDefaultMetadata(): Types.Ui3TabMetadata {
+    return {
+      surfaceType: 'community',
+      productIcon: 'figma-community',
+      isDevMode: false,
+      hasVariables: false,
+      hasComponents: false,
+      voiceIndicators: {
+        active: false,
+        participants: 0
+      }
+    };
+  }
 
     private registerEvents() {
     this.view.webContents.setWindowOpenHandler(this.windowOpenHandler.bind(this));

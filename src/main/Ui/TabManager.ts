@@ -293,7 +293,7 @@ export default class TabManager {
    return URL.parse(tabUri).pathname;
   }
 
-  public getTabByWebContentsId(webContentsId: number): Tab | undefined {
+  public getTabByWebContentsId(webContentsId: number): Tab | MainTab | CommunityTab | undefined {
    // Check main tab
    if (this.mainTab.view.webContents.id === webContentsId) {
      return this.mainTab;

@@ -15,7 +15,7 @@ import {
 
 import * as Const from "Const";
 import { request } from "Utils/Main";
-import { isAppAuthLink, isValidProjectLink } from "Utils/Common";
+import { isAppAuthLink, isValidProjectLink, isInAppUrl } from "Utils/Common";
 import Args from "./Args";
 import { logger } from "./Logger";
 import { storage } from "./Storage";
@@ -63,11 +63,14 @@ export default class App {
     }, 1500);
 
     protocol.handle(Const.PROTOCOL, (req: GlobalRequest) => {
-      logger.info("protocol.handle, req.url: ", req.url);
+      logger.info("[regression] Protocol handler invoked - URL:", req.url);
+      
       if (this.windowManager.tryHandleAppAuthRedeemUrl(req.url)) {
+        logger.info("[regression] Protocol - App auth redeem handled");
         return new Response();
       }
 
+      logger.info("[regression] Protocol - Opening URL in window manager");
       this.windowManager.openUrl(req.url);
 
       return net.fetch(req.url, { method: req.method });
@@ -78,7 +81,7 @@ export default class App {
     let projectLink = "";
     logger.debug("second-instance, argv: ", argv);
 
-    const paramIndex = argv.findIndex((i) => isValidProjectLink(i));
+    const paramIndex = argv.findIndex((i) => isInAppUrl(i));
     const hasAppAuthorization = argv.find((i) => isAppAuthLink(i));
 
     logger.debug("second-instance, hasAppAuthorization: ", hasAppAuthorization);
@@ -140,17 +143,28 @@ export default class App {
     logger.warn("The setFigjamEnabled not implemented, enabled: ", enabled);
   }
   private setClipboardData(_: IpcMainEvent, data: WebApi.SetClipboardData) {
+    // Regression logging for clipboard flows
+    logger.info("[regression] Clipboard data set - format:", data.format, "size:", data.data?.length || 0);
+    
     const format = data.format;
     const buffer = Buffer.from(data.data);
 
-    if (["image/jpeg", "image/png"].indexOf(format) !== -1) {
-      clipboard.writeImage(nativeImage.createFromBuffer(buffer));
-    } else if (format === "image/svg+xml") {
-      clipboard.writeText(buffer.toString());
-    } else if (format === "application/pdf") {
-      clipboard.writeBuffer("Portable Document Format", buffer);
-    } else {
-      clipboard.writeBuffer(format, buffer);
+    try {
+      if (["image/jpeg", "image/png"].indexOf(format) !== -1) {
+        clipboard.writeImage(nativeImage.createFromBuffer(buffer));
+        logger.info("[regression] Clipboard image write successful");
+      } else if (format === "image/svg+xml") {
+        clipboard.writeText(buffer.toString());
+        logger.info("[regression] Clipboard SVG write successful");
+      } else if (format === "application/pdf") {
+        clipboard.writeBuffer("Portable Document Format", buffer);
+        logger.info("[regression] Clipboard PDF write successful");
+      } else {
+        clipboard.writeBuffer(format, buffer);
+        logger.info("[regression] Clipboard buffer write successful");
+      }
+    } catch (error) {
+      logger.error("[regression] Clipboard write failed:", error);
     }
   }
   private async getFonts(_: IpcMainInvokeEvent) {
@@ -202,6 +216,10 @@ export default class App {
     app.quit();
   }
 
+  private trackPatIssuance() {
+    this.session.trackPatIssuance();
+  }
+
   private registerEvents = (): void => {
     ipcMain.on("frontReady", this.frontReady.bind(this));
     ipcMain.on("setAuthedUsers", this.setAuthedUsers.bind(this));
@@ -218,5 +236,6 @@ export default class App {
     app.on("relaunchApp", this.relaunchApp.bind(this));
     app.on("signOut", this.logout.bind(this));
     app.on("quitApp", this.quitApp.bind(this));
+    app.on("trackPatIssuance", this.trackPatIssuance.bind(this));
   };
 }

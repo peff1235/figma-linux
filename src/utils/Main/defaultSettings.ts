@@ -5,6 +5,7 @@ export const DEFAULT_SETTINGS: Types.SettingsInterface = {
   clientId: randomUUID(),
   userId: "",
   authedUserIDs: [],
+  patIssuedAt: null,
   app: {
     logLevel: LogLevel.INFO,
     lastTimeClearLogFile: 0,
@@ -46,5 +47,11 @@ export const DEFAULT_SETTINGS: Types.SettingsInterface = {
   ui: {
     scalePanel: 1,
     scaleFigmaUI: 1,
+    useUi3Chrome: false,
+    panelLayout: "top",
+    showProductIcons: true,
+    showVoiceIndicators: true,
+    sidebarCollapsed: false,
+    panelHeight: 40,
   },
 };
