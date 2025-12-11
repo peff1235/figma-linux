@@ -23,6 +23,8 @@ export default class CommunityTab {
   public userId: string;
   public id: number;
   public view: BrowserView;
+  // UI3 metadata
+  public metadata?: Types.Ui3TabMetadata;
 
   constructor(private windowId: number) {
     this.userId = storage.settings.userId;

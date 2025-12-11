@@ -4,6 +4,7 @@ import { storage } from "Main/Storage";
 import SettingsView from "./SettingsView";
 import TabManager from "./TabManager";
 import { logger } from "../Logger";
+import { Ui3SettingsMigration } from "../../utils/Ui3SettingsMigration";
 
 import {
   HOMEPAGE,
@@ -25,6 +26,9 @@ export default class Window {
   private _userId: string;
 
   constructor(state: Types.WindowState) {
+    // Migrate UI3 settings on startup
+    Ui3SettingsMigration.migrate();
+    
     this.window = new BrowserWindow(WINDOW_DEFAULT_OPTIONS);
     this.tabManager = new TabManager(this.window.id);
     this.settingsView = new SettingsView();
@@ -87,6 +91,32 @@ export default class Window {
   public setUserId(id: string) {
     this._userId = id;
     this.tabManager.setUserId(id);
+  }
+
+  // UI3 Surface Recognition and Metadata Management
+  public updateTabSurfaceMetadata(tabId: number, metadata: Types.Ui3TabMetadata) {
+    const tab = this.tabManager.getById(tabId);
+    if (tab) {
+      tab.updateSurfaceMetadata(metadata);
+      // Forward metadata to renderer panel
+      this.window.webContents.send("updateTabSurfaceMetadata", {
+        tabId,
+        metadata
+      });
+    }
+  }
+
+  public forwardBottomNavFocusChange(tabId: number, focusIndex: number) {
+    const tab = this.tabManager.getById(tabId);
+    if (tab) {
+      tab.updateBottomNavFocus(focusIndex);
+      // Forward to renderer panel
+      this.window.webContents.send("bottomNavFocusChange", {
+        tabId,
+        focusIndex,
+        timestamp: Date.now()
+      });
+    }
   }
   public sortTabs(tabs: Types.TabFront[]) {
     this.tabManager.sortTabs(tabs);
@@ -603,47 +633,132 @@ export default class Window {
    this.window.close();
   }
 
-  // UI3 specific methods
+  // UI3 Surface and Navigation Management
   public openProductSurface(event: IpcMainEvent, surfaceType: string, args: any) {
-   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
-   if (tab) {
-     tab.openProductSurface(surfaceType, args);
-   }
+    const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+    if (tab) {
+      // Update tab metadata with new surface information
+      tab.openProductSurface(surfaceType, args);
+      
+      // Extract and update surface metadata
+      const metadata = this.extractSurfaceMetadata(surfaceType, args);
+      this.updateTabSurfaceMetadata(tab.id, metadata);
+      
+      // Forward to renderer for UI updates
+      this.window.webContents.send("surfaceChanged", {
+        tabId: tab.id,
+        surfaceType,
+        metadata,
+        timestamp: Date.now()
+      });
+    }
   }
 
-  public setBottomNavState(event: IpcMainEvent, state: any) {
-   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
-   if (tab) {
-     tab.setBottomNavState(state);
-   }
+  public setBottomNavState(event: IpcMainEvent, state: Types.BottomNavState) {
+    const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+    if (tab) {
+      tab.setBottomNavState(state);
+      
+      // Forward to renderer panel for chrome updates
+      this.window.webContents.send("bottomNavStateUpdate", {
+        tabId: tab.id,
+        state,
+        timestamp: Date.now()
+      });
+      
+      // Update tab metadata
+      if (tab.metadata) {
+        tab.metadata.bottomNavState = state;
+      }
+    }
   }
 
+  // Enhanced UI3 Event Handlers
   public requestAiCredits(event: IpcMainEvent, request: any) {
-   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
-   if (tab) {
-     tab.requestAiCredits(request);
-   }
+    const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+    if (tab) {
+      tab.requestAiCredits(request);
+      // Could trigger UI notifications or credit display
+      this.window.webContents.send("aiCreditsRequest", {
+        tabId: tab.id,
+        request,
+        timestamp: Date.now()
+      });
+    }
   }
 
   public exportVariables(event: IpcMainEvent, variables: any) {
-   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
-   if (tab) {
-     tab.exportVariables(variables);
-   }
+    const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+    if (tab) {
+      tab.exportVariables(variables);
+      
+      // Update tab metadata to indicate variables export
+      if (tab.metadata) {
+        tab.metadata.hasVariables = true;
+        this.window.webContents.send("variablesExported", {
+          tabId: tab.id,
+          variablesCount: variables?.length || 0,
+          timestamp: Date.now()
+        });
+      }
+    }
   }
 
   public devModeReady(event: IpcMainEvent, ready: boolean) {
-   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
-   if (tab) {
-     tab.devModeReady(ready);
-   }
+    const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+    if (tab) {
+      tab.devModeReady(ready);
+      
+      // Update tab metadata and notify renderer
+      if (tab.metadata) {
+        tab.metadata.isDevMode = ready;
+        this.window.webContents.send("devModeStateChange", {
+          tabId: tab.id,
+          isReady: ready,
+          timestamp: Date.now()
+        });
+      }
+    }
   }
 
   public webhooksV2Update(event: IpcMainEvent, update: any) {
-   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
-   if (tab) {
-     tab.webhooksV2Update(update);
-   }
+    const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+    if (tab) {
+      tab.webhooksV2Update(update);
+      // Forward webhook updates to renderer for real-time UI updates
+      this.window.webContents.send("webhooksV2Update", {
+        tabId: tab.id,
+        update,
+        timestamp: Date.now()
+      });
+    }
+  }
+
+  // UI3 Utility Methods
+  private extractSurfaceMetadata(surfaceType: string, args: any): Types.Ui3TabMetadata {
+    const surfaceIcons: Record<string, string> = {
+      'design': 'figma-design',
+      'figjam': 'figma-figjam', 
+      'draw': 'figma-draw',
+      'sites': 'figma-sites',
+      'make': 'figma-make',
+      'buzz': 'figma-buzz',
+      'slides': 'figma-slides',
+      'dev-mode': 'dev-mode-icon',
+      'prototype': 'prototype-icon'
+    };
+
+    return {
+      surfaceType: surfaceType as Types.ProductSurfaceType,
+      productIcon: surfaceIcons[surfaceType] || 'default-surface',
+      isDevMode: surfaceType === 'dev-mode',
+      hasVariables: false,
+      hasComponents: false,
+      voiceIndicators: {
+        active: false,
+        participants: 0
+      }
+    };
   }
 
   private registerEvents() {

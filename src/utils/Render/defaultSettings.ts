@@ -45,5 +45,12 @@ export const DEFAULT_SETTINGS: Types.SettingsInterface = {
   ui: {
     scalePanel: 1,
     scaleFigmaUI: 1,
+    // UI3 specific preferences
+    useUi3Chrome: false,
+    panelLayout: "top",
+    showProductIcons: true,
+    showVoiceIndicators: true,
+    sidebarCollapsed: false,
+    panelHeight: 40,
   },
 };
