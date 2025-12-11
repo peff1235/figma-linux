@@ -110,20 +110,46 @@ declare namespace WebApi {
     navigationConfig: NavigationConfig;
   }
   interface WriteNewExtensionDirectoryToDiskFile {
-    name: string;
-    content: string;
+   name: string;
+   content: string;
   }
   interface WriteNewExtensionDirectoryToDisk {
-    dir: {
-      name: string;
-      dirs: string[];
-      files: WriteNewExtensionDirectoryToDiskFile[];
-    };
+   dir: {
+     name: string;
+     dirs: string[];
+     files: WriteNewExtensionDirectoryToDiskFile[];
+   };
   }
   interface ExtensionsCachedMetadataMap {
-    [key: string]: {
-      lastKnownPluginId: string;
-      cachedContainsWidget: boolean;
-    };
+   [key: string]: {
+     lastKnownPluginId: string;
+     cachedContainsWidget: boolean;
+   };
   }
-}
+
+  // UI3 specific interfaces
+  interface OpenProductSurface {
+   surfaceType: string;
+   args?: any;
+  }
+
+  interface SetBottomNavState {
+   state: any;
+  }
+
+  interface RequestAiCredits {
+   request: any;
+  }
+
+  interface ExportVariables {
+   variables: any;
+  }
+
+  interface DevModeReady {
+   ready: boolean;
+  }
+
+  interface WebhooksV2Update {
+   update: any;
+  }
+  }

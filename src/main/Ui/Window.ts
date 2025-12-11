@@ -600,7 +600,50 @@ export default class Window {
   }
 
   public close() {
-    this.window.close();
+   this.window.close();
+  }
+
+  // UI3 specific methods
+  public openProductSurface(event: IpcMainEvent, surfaceType: string, args: any) {
+   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+   if (tab) {
+     tab.openProductSurface(surfaceType, args);
+   }
+  }
+
+  public setBottomNavState(event: IpcMainEvent, state: any) {
+   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+   if (tab) {
+     tab.setBottomNavState(state);
+   }
+  }
+
+  public requestAiCredits(event: IpcMainEvent, request: any) {
+   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+   if (tab) {
+     tab.requestAiCredits(request);
+   }
+  }
+
+  public exportVariables(event: IpcMainEvent, variables: any) {
+   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+   if (tab) {
+     tab.exportVariables(variables);
+   }
+  }
+
+  public devModeReady(event: IpcMainEvent, ready: boolean) {
+   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+   if (tab) {
+     tab.devModeReady(ready);
+   }
+  }
+
+  public webhooksV2Update(event: IpcMainEvent, update: any) {
+   const tab = this.tabManager.getTabByWebContentsId(event.sender.id);
+   if (tab) {
+     tab.webhooksV2Update(update);
+   }
   }
 
   private registerEvents() {

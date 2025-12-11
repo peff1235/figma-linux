@@ -279,8 +279,34 @@ declare namespace Electron {
       listener: (event: IpcMainEvent, callbackID: number, args?: any) => void,
     ): this;
     on(
-      channel: "web-callback:registerUiChangeObserver",
-      listener: (event: IpcMainEvent, callbackID: number, args?: any) => void,
+     channel: "web-callback:registerUiChangeObserver",
+     listener: (event: IpcMainEvent, callbackID: number, args?: any) => void,
+    ): this;
+
+    // UI3 specific handlers
+    on(
+     channel: "openProductSurface",
+     listener: (event: IpcMainEvent, surfaceType: string, args: any) => void,
+    ): this;
+    on(
+     channel: "setBottomNavState",
+     listener: (event: IpcMainEvent, state: any) => void,
+    ): this;
+    on(
+     channel: "requestAiCredits",
+     listener: (event: IpcMainEvent, request: any) => void,
+    ): this;
+    on(
+     channel: "exportVariables",
+     listener: (event: IpcMainEvent, variables: any) => void,
+    ): this;
+    on(
+     channel: "devModeReady",
+     listener: (event: IpcMainEvent, ready: boolean) => void,
+    ): this;
+    on(
+     channel: "webhooksV2Update",
+     listener: (event: IpcMainEvent, update: any) => void,
     ): this;
 
     handle(
@@ -483,6 +509,14 @@ declare namespace Electron {
     ): this;
     send(channed: "web-callback:registerCodeChangeObserver", callbackID: number, args?: any): this;
     send(channed: "web-callback:registerUiChangeObserver", callbackID: number, args?: any): this;
+
+    // UI3 specific handlers
+    send(channed: "openProductSurface", surfaceType: string, args?: any): this;
+    send(channed: "setBottomNavState", state: any): this;
+    send(channed: "requestAiCredits", request: any): this;
+    send(channed: "exportVariables", variables: any): this;
+    send(channed: "devModeReady", ready: boolean): this;
+    send(channed: "webhooksV2Update", update: any): this;
 
     sendSync(channed: "getSettings"): Types.SettingsInterface;
 

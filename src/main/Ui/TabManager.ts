@@ -287,10 +287,31 @@ export default class TabManager {
   }
 
   public getActiveTabPath(): string {
-    const tab = this.getById(this.lastFocusedTab);
-    const tabUri = tab.view.webContents.getURL();
+   const tab = this.getById(this.lastFocusedTab);
+   const tabUri = tab.view.webContents.getURL();
 
-    return URL.parse(tabUri).pathname;
+   return URL.parse(tabUri).pathname;
+  }
+
+  public getTabByWebContentsId(webContentsId: number): Tab | undefined {
+   // Check main tab
+   if (this.mainTab.view.webContents.id === webContentsId) {
+     return this.mainTab;
+   }
+
+   // Check community tab
+   if (this.communityTab && this.communityTab.view.webContents.id === webContentsId) {
+     return this.communityTab;
+   }
+
+   // Check regular tabs
+   for (const [_, tab] of this.tabs) {
+     if (tab.view.webContents.id === webContentsId) {
+       return tab;
+     }
+   }
+
+   return undefined;
   }
 
   private loadCurrentTheme(theme: Themes.Theme) {

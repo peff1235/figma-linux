@@ -186,14 +186,39 @@ export default class MainTab {
   }
 
   private windowOpenHandler(details: HandlerDetails) {
-    const { url } = details;
+   const { url } = details;
 
-    if (isPrototypeUrl(url) || isValidProjectLink(url) || isFigmaBoardLink(url) || isFigmaDesignLink(url)) {
-      app.emit("openUrlInNewTab", url);
-      return { action: "deny" };
-    } else {
-      return { action: "allow" };
-    }
+   if (isPrototypeUrl(url) || isValidProjectLink(url) || isFigmaBoardLink(url) || isFigmaDesignLink(url)) {
+     app.emit("openUrlInNewTab", url);
+     return { action: "deny" };
+   } else {
+     return { action: "allow" };
+   }
+  }
+
+  // UI3 specific methods
+  public openProductSurface(surfaceType: string, args: any) {
+   this.view.webContents.send("openProductSurface", surfaceType, args);
+  }
+
+  public setBottomNavState(state: any) {
+   this.view.webContents.send("setBottomNavState", state);
+  }
+
+  public requestAiCredits(request: any) {
+   this.view.webContents.send("requestAiCredits", request);
+  }
+
+  public exportVariables(variables: any) {
+   this.view.webContents.send("exportVariables", variables);
+  }
+
+  public devModeReady(ready: boolean) {
+   this.view.webContents.send("devModeReady", ready);
+  }
+
+  public webhooksV2Update(update: any) {
+   this.view.webContents.send("webhooksV2Update", update);
   }
 
   private registerEvents() {

@@ -645,6 +645,37 @@ export default class WindowManager {
     window.setLoading(event, args);
   }
 
+  // UI3 specific handlers
+  private openProductSurface(event: IpcMainEvent, surfaceType: string, args: any) {
+    const window = this.getWindowByWebContentsId(event.sender.id);
+    window.openProductSurface(event, surfaceType, args);
+  }
+
+  private setBottomNavState(event: IpcMainEvent, state: any) {
+    const window = this.getWindowByWebContentsId(event.sender.id);
+    window.setBottomNavState(event, state);
+  }
+
+  private requestAiCredits(event: IpcMainEvent, request: any) {
+    const window = this.getWindowByWebContentsId(event.sender.id);
+    window.requestAiCredits(event, request);
+  }
+
+  private exportVariables(event: IpcMainEvent, variables: any) {
+    const window = this.getWindowByWebContentsId(event.sender.id);
+    window.exportVariables(event, variables);
+  }
+
+  private devModeReady(event: IpcMainEvent, ready: boolean) {
+    const window = this.getWindowByWebContentsId(event.sender.id);
+    window.devModeReady(event, ready);
+  }
+
+  private webhooksV2Update(event: IpcMainEvent, update: any) {
+    const window = this.getWindowByWebContentsId(event.sender.id);
+    window.webhooksV2Update(event, update);
+  }
+
   private registerEvents() {
     ipcMain.handle("selectExportDirectory", this.selectExportDirectory);
     ipcMain.handle("updatePanelScale", this.updatePanelScale.bind(this));
@@ -686,6 +717,14 @@ export default class WindowManager {
     ipcMain.on("windowMaximize", this.windowMaimize.bind(this));
     ipcMain.on("setLoading", this.setLoading.bind(this));
     ipcMain.on("toggleCurrentWindowFullscreen", this.toggleCurrentWindowFullscreen.bind(this));
+
+    // UI3 specific handlers
+    ipcMain.on("openProductSurface", this.openProductSurface.bind(this));
+    ipcMain.on("setBottomNavState", this.setBottomNavState.bind(this));
+    ipcMain.on("requestAiCredits", this.requestAiCredits.bind(this));
+    ipcMain.on("exportVariables", this.exportVariables.bind(this));
+    ipcMain.on("devModeReady", this.devModeReady.bind(this));
+    ipcMain.on("webhooksV2Update", this.webhooksV2Update.bind(this));
 
     // Events from main menu
     app.on("newFile", this.newFile.bind(this));
