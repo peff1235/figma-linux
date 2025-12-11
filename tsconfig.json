@@ -4,9 +4,9 @@
     "baseUrl": "./",
     "noImplicitAny": true,
     "allowJs": false,
-    "target": "ESNext",
+    "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "bundler",
     "sourceMap": true,
     "preserveConstEnums": true,
     "removeComments": true,
@@ -20,7 +20,7 @@
     "strictNullChecks": false,
     "lib": [
       "dom",
-      "es7",
+      "es2020",
       "esnext"
     ],
     "typeRoots": [

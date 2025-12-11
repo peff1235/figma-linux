@@ -36,9 +36,11 @@ export default class MainTab {
     webPreferences: {
       nodeIntegration: false,
       webgl: true,
-      contextIsolation: false,
+      contextIsolation: true,
+      sandbox: true,
       zoomFactor: 1,
       preload: isDev ? preloadMainScriptPathDev : preloadMainScriptPathProd,
+      spellcheck: true,
     },
   };
 

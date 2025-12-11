@@ -62,9 +62,11 @@ export default class Tab {
       webPreferences: {
         nodeIntegration: false,
         webgl: true,
-        contextIsolation: false,
+        contextIsolation: true,
+        sandbox: true,
         zoomFactor: 1,
         preload: isDev ? preloadScriptPathDev : preloadScriptPathProd,
+        spellcheck: true,
       },
     };
 

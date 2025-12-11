@@ -7,6 +7,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2021,
     sourceType: "module",
+    project: ["./tsconfig.json"],
+    tsconfigRootDir: path.resolve(__dirname, ".."),
   },
   rules: {
     "jsx-quotes": [1, "prefer-double"],
