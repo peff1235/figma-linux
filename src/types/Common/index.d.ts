@@ -1,4 +1,47 @@
 declare namespace Types {
+  // UI3 Product Surface Types
+  type ProductSurfaceType = 
+    | "design" 
+    | "figjam" 
+    | "draw" 
+    | "sites" 
+    | "make" 
+    | "buzz" 
+    | "slides" 
+    | "dev-mode"
+    | "prototype"
+    | "community"
+    | "recent-files"
+    | "login";
+
+  // UI3 Navigation State
+  interface BottomNavState {
+    activeSurface: ProductSurfaceType;
+    visible: boolean;
+    focusIndex: number;
+    surfaces: Array<{
+      type: ProductSurfaceType;
+      label: string;
+      icon: string;
+      enabled: boolean;
+      badge?: string;
+    }>;
+  }
+
+  // UI3 Tab Metadata
+  interface Ui3TabMetadata {
+    surfaceType: ProductSurfaceType;
+    productIcon: string;
+    isDevMode: boolean;
+    hasVariables: boolean;
+    hasComponents: boolean;
+    voiceIndicators: {
+      active: boolean;
+      participants: number;
+    };
+    bottomNavState?: BottomNavState;
+  }
+
   interface Tab {
     id: number;
     title?: string;
@@ -11,13 +54,20 @@ declare namespace Types {
     isInVoiceCall?: boolean;
     loading?: boolean;
     view: import("electron").BrowserView;
+    // UI3 enhancements
+    metadata?: Ui3TabMetadata;
   }
 
   type TabIdType = number | "mainTab" | "communityTab";
   type TabFront = Pick<
     Tab,
     "id" | "title" | "order" | "isUsingMicrophone" | "isInVoiceCall" | "loading"
-  >;
+  > & {
+    // UI3 metadata for frontend
+    surfaceType?: ProductSurfaceType;
+    productIcon?: string;
+    isDevMode?: boolean;
+  };
 
   interface AddTabProps {
     id: number;
@@ -108,6 +158,13 @@ declare namespace Types {
     ui: {
       scalePanel: number;
       scaleFigmaUI: number;
+      // UI3 specific preferences
+      useUi3Chrome: boolean;
+      panelLayout: "top" | "bottom";
+      showProductIcons: boolean;
+      showVoiceIndicators: boolean;
+      sidebarCollapsed: boolean;
+      panelHeight: number;
     };
     theme: {
       currentTheme: string;

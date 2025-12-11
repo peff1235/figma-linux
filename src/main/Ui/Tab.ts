@@ -32,6 +32,8 @@ export default class Tab {
   public isUsingMicrophone?: boolean;
   public isInVoiceCall?: boolean;
   public view: BrowserView;
+  // UI3 metadata
+  public metadata?: Types.Ui3TabMetadata;
 
   constructor(private windowId: number) {
     this.initTab();
@@ -210,30 +212,99 @@ export default class Tab {
     return { action: "deny" };
   }
 
-  // UI3 specific methods
+  // UI3 Surface and Metadata Management
   public openProductSurface(surfaceType: string, args: any) {
-    // Forward to the web contents
+    // Update internal metadata first
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
+    }
+    
+    this.metadata.surfaceType = surfaceType as Types.ProductSurfaceType;
+    
+    // Forward to web contents
     this.view.webContents.send("openProductSurface", surfaceType, args);
   }
 
-  public setBottomNavState(state: any) {
+  public setBottomNavState(state: Types.BottomNavState) {
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
+    }
+    
+    this.metadata.bottomNavState = state;
     this.view.webContents.send("setBottomNavState", state);
   }
 
+  public updateSurfaceMetadata(metadata: Types.Ui3TabMetadata) {
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
+    }
+    
+    this.metadata = { ...this.metadata, ...metadata };
+  }
+
+  public updateBottomNavFocus(focusIndex: number) {
+    if (this.metadata?.bottomNavState) {
+      this.metadata.bottomNavState.focusIndex = focusIndex;
+    }
+  }
+
+  // Enhanced UI3 Methods
   public requestAiCredits(request: any) {
     this.view.webContents.send("requestAiCredits", request);
   }
 
   public exportVariables(variables: any) {
     this.view.webContents.send("exportVariables", variables);
+    
+    // Update metadata
+    if (this.metadata) {
+      this.metadata.hasVariables = true;
+    }
   }
 
   public devModeReady(ready: boolean) {
     this.view.webContents.send("devModeReady", ready);
+    
+    // Update metadata
+    if (this.metadata) {
+      this.metadata.isDevMode = ready;
+    }
   }
 
   public webhooksV2Update(update: any) {
     this.view.webContents.send("webhooksV2Update", update);
+  }
+
+  // UI3 Voice and Component Tracking
+  public updateVoiceState(active: boolean, participants: number = 0) {
+    if (!this.metadata) {
+      this.metadata = this.createDefaultMetadata();
+    }
+    
+    this.metadata.voiceIndicators = {
+      active,
+      participants
+    };
+  }
+
+  public updateComponentState(hasComponents: boolean) {
+    if (this.metadata) {
+      this.metadata.hasComponents = hasComponents;
+    }
+  }
+
+  private createDefaultMetadata(): Types.Ui3TabMetadata {
+    return {
+      surfaceType: 'design',
+      productIcon: 'figma-design',
+      isDevMode: false,
+      hasVariables: false,
+      hasComponents: false,
+      voiceIndicators: {
+        active: false,
+        participants: 0
+      }
+    };
   }
 
   private registerEvents() {
