@@ -17,7 +17,8 @@ export const WINDOW_DEFAULT_OPTIONS: BrowserWindowConstructorOptions = {
     contextIsolation: true,
     preload: undefined,
     spellcheck: true,
-  },
+    userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  } as any,
 };
 
 export const DEFAULT_WIN_OPTIONS: Types.WindowState = {
