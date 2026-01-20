@@ -11,8 +11,8 @@ interface IntiApiOptions {
   fileBrowser: boolean;
 }
 
-const API_VERSION = 135;
-const APP_VERSION = '1.0.0';
+const API_VERSION = 111;
+const APP_VERSION = '999.0.0';
 let webPort: MessagePort;
 const mainProcessCancelCallbacks: Map<number, () => void> = new Map();
 
